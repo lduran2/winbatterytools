@@ -4,12 +4,15 @@
 # interval of time.
 #
 # By        : Leomar Durán <https://github.com/lduran2/>
-# When      : 2022-01-03t01:45R
-# Version   : 0.1.0a
+# When      : 2022-01-03t03:40R
+# Version   : 1.0.0
 #
 # CHANGELOG :
-#   v0.0.0 - 2022-01-03t01:45R
-#       testing results for query with WbemScripting.SWbemLocator
+#   v1.0.0 - 2022-01-03t03:40R
+#       successfully printing charge capacity using `WmiObject`
+#
+#   v0.1.0a - 2022-01-03t01:45R
+#       testing results for query with `WbemScripting.SWbemLocator`
 #
 #   v0.0.0 - 2022-01-02t22:10R
 #       hello world implementation
@@ -30,19 +33,13 @@ Set-Variable VERBOSE -Option Constant -Value $true;
 Set-Variable MANAGEMENT_NAMESPACE -Option Constant -Value 'root\WMI';
 # this computer
 Set-Variable COMPUTER_NAME -Option Constant -Value '.';
-# query for full charge ammount
-Set-Variable CHARGE_CAP_QUERY -Option Constant `
-    -Value 'SELECT * FROM BatteryFullChargedCapacity';
+# class for full charge amount
+Set-Variable CHARGE_CAP_CLASS -Option Constant `
+    -Value 'BatteryFullChargedCapacity';
 
-# create services locator
-$Locator = New-Object -ComObject 'WbemScripting.SWbemLocator';
-# connect to management namespace
-$Services = $Locator.ConnectServer($COMPUTER_NAME, $MANAGEMENT_NAMESPACE);
 # query for charge capacity
-$FullChargeResults = $Services.ExecQuery($CHARGE_CAP_QUERY);
+$FullChargeResult = Get-WmiObject -Computer $COMPUTER_NAME `
+    -Namespace $MANAGEMENT_NAMESPACE -Class $CHARGE_CAP_CLASS;
 
-Write-Host($FullChargeResults)
-
-foreach ($result in $FullChargeResults) {
-    Write-Host($result.FullChargedCapacity)
-} # next $result in $FullChargeResults
+# print the result
+Write-Host($FullChargeResult.FullChargedCapacity)
